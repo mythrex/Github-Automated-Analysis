@@ -22,7 +22,7 @@ def callback(user: str, repo: dict) -> dict:
     """
     repo_name = repo["name"]
     clone_url = repo["clone_url"]
-    clone_repo(repo_name, clone_url)
+    clone_repo(user, repo_name, clone_url)
     return get_repo_stats(user, repo_name)
 
 
@@ -93,15 +93,17 @@ def get_all_repos(user: str) -> pd.DataFrame:
     return df
 
 
-def clone_repo(repo_name: str, clone_url: str):
+def clone_repo(user: str, repo_name: str, clone_url: str):
     """Function for cloning repo
 
     Args:
+        user (str): User name
         repo_name (str): Repo name
         clone_url (str): Repo URL
     """
-    local_path = f"./repos/{repo_name}"
-    Repo.clone_from(clone_url, local_path)
+    local_path = f"./repos/{user}/{repo_name}"
+    if not os.path.exists(local_path):
+        Repo.clone_from(clone_url, local_path)
 
 
 def main(user: str):
@@ -110,8 +112,8 @@ def main(user: str):
     Args:
         user (str): A string for username
     """
-    shutil.rmtree("repos")
-    os.makedirs("repos", exist_ok=True)
+    os.makedirs(f"repos/{user}", exist_ok=True)
+
     os.makedirs("dumped", exist_ok=True)
     df = get_all_repos(user)
     df.to_csv(f"dumped/{user}.repo_stats.csv", index=False)

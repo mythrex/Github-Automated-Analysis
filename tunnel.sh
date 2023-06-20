@@ -1,0 +1,1 @@
+~/.local/bin/loclx tunnel http --to localhost:8501
